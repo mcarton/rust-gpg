@@ -1,0 +1,4 @@
+[package]
+name = "gnupg"
+version = "0.1.0"
+authors = ["mcarton <cartonmartin+git@gmail.com>"]
