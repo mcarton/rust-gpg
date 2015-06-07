@@ -1304,6 +1304,7 @@ impl ::std::clone::Clone for Struct___va_list_tag {
 impl ::std::default::Default for Struct___va_list_tag {
     fn default() -> Self { unsafe { ::std::mem::zeroed() } }
 }
+#[link(name = "gpg-error")]
 extern "C" {
     pub static mut _IO_2_1_stdin_: Struct__IO_FILE_plus;
     pub static mut _IO_2_1_stdout_: Struct__IO_FILE_plus;
@@ -1314,6 +1315,7 @@ extern "C" {
     pub static mut sys_nerr: ::libc::c_int;
     pub static mut sys_errlist: *const *const ::libc::c_char;
 }
+#[link(name = "gpg-error")]
 extern "C" {
     pub fn __underflow(arg1: *mut _IO_FILE) -> ::libc::c_int;
     pub fn __uflow(arg1: *mut _IO_FILE) -> ::libc::c_int;
