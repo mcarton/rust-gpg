@@ -1,3 +1,5 @@
-#[test]
-fn it_works() {
-}
+#![feature(libc)]
+
+extern crate libc;
+
+mod bindings;
