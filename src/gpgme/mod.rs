@@ -17,6 +17,10 @@ impl Context {
         })
     }
 
+    pub fn raw(&self) -> ::bindings::gpgme::gpgme_ctx_t {
+        self.0
+    }
+
 }
 
 impl Drop for Context {
