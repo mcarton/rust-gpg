@@ -5,5 +5,5 @@
 
 extern crate libc;
 
-mod gpg_error;
-mod gpgme;
+pub mod gpg_error;
+pub mod gpgme;
