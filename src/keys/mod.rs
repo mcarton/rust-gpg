@@ -54,11 +54,18 @@ impl Iterator for KeyIterator {
 
 pub struct Key(::bindings::gpgme::gpgme_key_t);
 
+impl Key {
+
+    fn raw(&self) -> ::bindings::gpgme::gpgme_key_t {
+        self.0
+    }
+
+}
+
 impl Drop for Key {
 
     fn drop(&mut self) {
-        let &mut Key(key) = self;
-        unsafe { ::bindings::gpgme::gpgme_key_release(key) };
+        unsafe { ::bindings::gpgme::gpgme_key_release(self.raw()) };
     }
 
 }
