@@ -46,22 +46,20 @@ impl Iterator for KeyIterator {
             None
         }
         else {
-            Some(Key(key))
+            Some(Key{raw: key})
         }
     }
 
 }
 
-pub struct Key(::bindings::gpgme::gpgme_key_t);
+pub struct Key {
+    raw: ::bindings::gpgme::gpgme_key_t,
+}
 
 impl Key {
 
-    fn raw(&self) -> ::bindings::gpgme::gpgme_key_t {
-        self.0
-    }
-
     pub fn subkeys(&self) -> SubKeyIterator {
-        SubKeyIterator(SubKey(unsafe { self.raw().as_ref() }.unwrap().subkeys))
+        SubKeyIterator{current: SubKey{raw: unsafe { self.raw.as_ref() }.unwrap().subkeys}}
     }
 
 }
@@ -69,41 +67,41 @@ impl Key {
 impl Drop for Key {
 
     fn drop(&mut self) {
-        unsafe { ::bindings::gpgme::gpgme_key_release(self.raw()) };
+        unsafe { ::bindings::gpgme::gpgme_key_release(self.raw) };
     }
 
 }
 
-pub struct SubKeyIterator(SubKey);
+pub struct SubKeyIterator {
+    current: SubKey,
+}
 
 impl Iterator for SubKeyIterator {
     type Item = SubKey;
 
     fn next(&mut self) -> Option<SubKey> {
-        let raw = self.0.raw();
+        let raw = self.current.raw;
 
         if raw.is_null() {
             None
         }
         else {
-            self.0 = SubKey(unsafe { raw.as_ref() }.unwrap().next );
-            Some(SubKey(raw))
+            self.current = SubKey{raw: unsafe { raw.as_ref() }.unwrap().next};
+            Some(SubKey{raw: raw})
         }
     }
 
 }
 
 #[derive(Clone)]
-pub struct SubKey(::bindings::gpgme::gpgme_subkey_t);
+pub struct SubKey {
+    raw: ::bindings::gpgme::gpgme_subkey_t,
+}
 
 impl SubKey {
 
-    fn raw(&self) -> ::bindings::gpgme::gpgme_subkey_t {
-        self.0
-    }
-
     pub fn keyid(&self) -> String {
-        let keyid = unsafe { ::std::ffi::CStr::from_ptr(self.raw().as_ref().unwrap().keyid) };
+        let keyid = unsafe { ::std::ffi::CStr::from_ptr(self.raw.as_ref().unwrap().keyid) };
         ::std::str::from_utf8(keyid.to_bytes()).unwrap().to_owned()
     }
 
