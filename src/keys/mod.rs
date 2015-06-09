@@ -60,12 +60,46 @@ impl Key {
         self.0
     }
 
+    pub fn subkeys(&self) -> SubKeyIterator {
+        SubKeyIterator(SubKey(unsafe { self.raw().as_ref() }.unwrap().subkeys))
+    }
+
 }
 
 impl Drop for Key {
 
     fn drop(&mut self) {
         unsafe { ::bindings::gpgme::gpgme_key_release(self.raw()) };
+    }
+
+}
+
+pub struct SubKeyIterator(SubKey);
+
+impl Iterator for SubKeyIterator {
+    type Item = SubKey;
+
+    fn next(&mut self) -> Option<SubKey> {
+        let raw = self.0.raw();
+
+        if raw.is_null() {
+            None
+        }
+        else {
+            self.0 = SubKey(unsafe { raw.as_ref() }.unwrap().next );
+            Some(SubKey(raw))
+        }
+    }
+
+}
+
+#[derive(Clone)]
+pub struct SubKey(::bindings::gpgme::gpgme_subkey_t);
+
+impl SubKey {
+
+    fn raw(&self) -> ::bindings::gpgme::gpgme_subkey_t {
+        self.0
     }
 
 }
