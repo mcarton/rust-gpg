@@ -102,4 +102,9 @@ impl SubKey {
         self.0
     }
 
+    pub fn keyid(&self) -> String {
+        let keyid = unsafe { ::std::ffi::CStr::from_ptr(self.raw().as_ref().unwrap().keyid) };
+        ::std::str::from_utf8(keyid.to_bytes()).unwrap().to_owned()
+    }
+
 }
