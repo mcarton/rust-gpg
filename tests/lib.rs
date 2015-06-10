@@ -1,8 +1,11 @@
 extern crate gnupg;
 use gnupg::gpgme;
+use gnupg::keys;
 
 #[test]
-fn init_ctx() {
+fn test_key_list() {
     gpgme::init();
-    gpgme::Context::new();
+
+    let mut it = keys::KeyIterator::new();
+    while it.next().is_some() {}
 }
