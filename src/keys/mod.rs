@@ -70,6 +70,15 @@ impl Key {
         }
     }
 
+    pub fn uids<'a>(&'a self) -> UserIdIterator<'a> {
+        UserIdIterator{
+            current: UserId{
+                raw: unsafe { self.raw.as_ref() }.unwrap().uids,
+                lifetime: PhantomData,
+            }
+        }
+    }
+
 }
 
 impl Drop for Key {
@@ -115,6 +124,44 @@ impl<'a> SubKey<'a> {
     pub fn keyid(&self) -> String {
         let keyid = unsafe { ::std::ffi::CStr::from_ptr(self.raw.as_ref().unwrap().keyid) };
         ::std::str::from_utf8(keyid.to_bytes()).unwrap().to_owned()
+    }
+
+}
+
+pub struct UserIdIterator<'a> {
+    current: UserId<'a>,
+}
+
+impl<'a> Iterator for UserIdIterator<'a> {
+    type Item = UserId<'a>;
+
+    fn next(&mut self) -> Option<UserId<'a>> {
+        let raw = self.current.raw;
+
+        if raw.is_null() {
+            None
+        }
+        else {
+            self.current = UserId{
+                raw: unsafe { raw.as_ref() }.unwrap().next,
+                lifetime: PhantomData,
+            };
+            Some(UserId{raw: raw, lifetime: PhantomData})
+        }
+    }
+
+}
+
+pub struct UserId<'a> {
+    raw: ::bindings::gpgme::gpgme_user_id_t,
+    lifetime: PhantomData<&'a Key>,
+}
+
+impl<'a> UserId<'a> {
+
+    pub fn uid(&self) -> String {
+        let uid = unsafe { ::std::ffi::CStr::from_ptr(self.raw.as_ref().unwrap().uid) };
+        ::std::str::from_utf8(uid.to_bytes()).unwrap().to_owned()
     }
 
 }
