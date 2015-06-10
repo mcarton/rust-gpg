@@ -2,3 +2,6 @@
 name = "gnupg"
 version = "0.1.0"
 authors = ["mcarton <cartonmartin+git@gmail.com>"]
+repository = "https://github.com/mcarton/rust-gpg"
+license = "GPL-3.0/LGPL-3.0"
+description = "A simple wrapper for gpgme"
