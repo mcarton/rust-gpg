@@ -1,3 +1,6 @@
+extern crate core;
+use self::core::marker::PhantomData;
+
 pub struct KeyIterator {
     ctx : ::gpgme::Context,
 }
@@ -58,8 +61,13 @@ pub struct Key {
 
 impl Key {
 
-    pub fn subkeys(&self) -> SubKeyIterator {
-        SubKeyIterator{current: SubKey{raw: unsafe { self.raw.as_ref() }.unwrap().subkeys}}
+    pub fn subkeys<'a>(&'a self) -> SubKeyIterator<'a> {
+        SubKeyIterator{
+            current: SubKey{
+                raw: unsafe { self.raw.as_ref() }.unwrap().subkeys,
+                lifetime: PhantomData,
+            }
+        }
     }
 
 }
@@ -72,33 +80,37 @@ impl Drop for Key {
 
 }
 
-pub struct SubKeyIterator {
-    current: SubKey,
+pub struct SubKeyIterator<'a> {
+    current: SubKey<'a>,
 }
 
-impl Iterator for SubKeyIterator {
-    type Item = SubKey;
+impl<'a> Iterator for SubKeyIterator<'a> {
+    type Item = SubKey<'a>;
 
-    fn next(&mut self) -> Option<SubKey> {
+    fn next(&mut self) -> Option<SubKey<'a>> {
         let raw = self.current.raw;
 
         if raw.is_null() {
             None
         }
         else {
-            self.current = SubKey{raw: unsafe { raw.as_ref() }.unwrap().next};
-            Some(SubKey{raw: raw})
+            self.current = SubKey{
+                raw: unsafe { raw.as_ref() }.unwrap().next,
+                lifetime: PhantomData,
+            };
+            Some(SubKey{raw: raw, lifetime: PhantomData})
         }
     }
 
 }
 
 #[derive(Clone)]
-pub struct SubKey {
+pub struct SubKey<'a> {
     raw: ::bindings::gpgme::gpgme_subkey_t,
+    lifetime: PhantomData<&'a Key>,
 }
 
-impl SubKey {
+impl<'a> SubKey<'a> {
 
     pub fn keyid(&self) -> String {
         let keyid = unsafe { ::std::ffi::CStr::from_ptr(self.raw.as_ref().unwrap().keyid) };
