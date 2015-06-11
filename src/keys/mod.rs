@@ -157,11 +157,57 @@ pub struct UserId<'a> {
     lifetime: PhantomData<&'a Key>,
 }
 
+#[derive(Debug)]
+pub enum Validity {
+    Unknown,
+    Undefined,
+    Never,
+    Marginal,
+    Full,
+    Ultimate,
+}
+
+impl ::std::fmt::Display for Validity {
+
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> Result<(), ::std::fmt::Error> {
+        ::std::fmt::Debug::fmt(self, f)
+    }
+
+}
+
+impl From<Validity> for char {
+
+    fn from(v: Validity) -> char {
+        match v {
+            Validity::Unknown   => '?',
+            Validity::Undefined => 'q',
+            Validity::Never     => 'n',
+            Validity::Marginal  => 'm',
+            Validity::Full      => 'f',
+            Validity::Ultimate  => 'u',
+        }
+    }
+
+}
+
 impl<'a> UserId<'a> {
 
     pub fn uid(&self) -> String {
         let uid = unsafe { ::std::ffi::CStr::from_ptr(self.raw.as_ref().unwrap().uid) };
         ::std::str::from_utf8(uid.to_bytes()).unwrap().to_owned()
+    }
+
+    pub fn validity(&self) -> Validity {
+        let validity = unsafe { self.raw.as_ref().unwrap().validity };
+        match validity {
+            ::bindings::gpgme::GPGME_VALIDITY_UNKNOWN   => Validity::Unknown,
+            ::bindings::gpgme::GPGME_VALIDITY_UNDEFINED => Validity::Undefined,
+            ::bindings::gpgme::GPGME_VALIDITY_NEVER     => Validity::Never,
+            ::bindings::gpgme::GPGME_VALIDITY_MARGINAL  => Validity::Marginal,
+            ::bindings::gpgme::GPGME_VALIDITY_FULL      => Validity::Full,
+            ::bindings::gpgme::GPGME_VALIDITY_ULTIMATE  => Validity::Ultimate,
+            _ => unreachable!(),
+        }
     }
 
 }
