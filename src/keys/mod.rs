@@ -5,8 +5,10 @@ pub struct KeyIterator {
     ctx : ::gpgme::Context,
 }
 
+/// An iterator over the keys in your keyring.
 impl KeyIterator {
 
+    /// Construct a `KeyIterator` over your whole keyring.
     pub fn new() -> KeyIterator {
         let ctx = ::gpgme::Context::new();
 
@@ -55,6 +57,9 @@ impl Iterator for KeyIterator {
 
 }
 
+/// Represents a GPG key.
+///
+/// You can get one from `KeyIterator`.
 pub struct Key {
     raw: ::bindings::gpgme::gpgme_key_t,
 }
@@ -157,6 +162,7 @@ pub struct UserId<'a> {
     lifetime: PhantomData<&'a Key>,
 }
 
+/// Specify the validity of a user ID.
 #[derive(Debug)]
 pub enum Validity {
     Unknown,
@@ -177,6 +183,7 @@ impl ::std::fmt::Display for Validity {
 
 impl From<Validity> for char {
 
+    /// Convert a `Validity` to a char as `gpg` does.
     fn from(v: Validity) -> char {
         match v {
             Validity::Unknown   => '?',
