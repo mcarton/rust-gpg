@@ -5,12 +5,13 @@ use gnupg::keys;
 fn main() {
     gpgme::init();
 
-    let mut i = 0;
-    for key in keys::KeyIterator::new() {
-        i += 1;
-        println!("{}", i);
+    for (i, key) in keys::KeyIterator::new().enumerate() {
+        println!("key {}:", i);
         for subkey in key.subkeys() {
-            println!("{}", subkey.keyid());
+            println!("\t{}", subkey.keyid());
+        }
+        for uid in key.uids() {
+            println!("\t({})\t{}", uid.validity(), uid.uid());
         }
     }
 }
