@@ -98,23 +98,29 @@ pub struct SubKeyIterator<'a> {
     current: SubKey<'a>,
 }
 
+macro_rules! gpgme_linked_list_next {
+    ($Item: ident, $ItemA: ty) => {
+        fn next(&mut self) -> Option<$ItemA> {
+            let raw = self.current.raw;
+
+            if raw.is_null() {
+                None
+            }
+            else {
+                self.current = $Item{
+                    raw: unsafe { raw.as_ref() }.unwrap().next,
+                    lifetime: PhantomData,
+                };
+                Some($Item{raw: raw, lifetime: PhantomData})
+            }
+        }
+    }
+}
+
 impl<'a> Iterator for SubKeyIterator<'a> {
     type Item = SubKey<'a>;
 
-    fn next(&mut self) -> Option<SubKey<'a>> {
-        let raw = self.current.raw;
-
-        if raw.is_null() {
-            None
-        }
-        else {
-            self.current = SubKey{
-                raw: unsafe { raw.as_ref() }.unwrap().next,
-                lifetime: PhantomData,
-            };
-            Some(SubKey{raw: raw, lifetime: PhantomData})
-        }
-    }
+    gpgme_linked_list_next!(SubKey, SubKey<'a>);
 
 }
 
@@ -140,21 +146,7 @@ pub struct UserIdIterator<'a> {
 impl<'a> Iterator for UserIdIterator<'a> {
     type Item = UserId<'a>;
 
-    fn next(&mut self) -> Option<UserId<'a>> {
-        let raw = self.current.raw;
-
-        if raw.is_null() {
-            None
-        }
-        else {
-            self.current = UserId{
-                raw: unsafe { raw.as_ref() }.unwrap().next,
-                lifetime: PhantomData,
-            };
-            Some(UserId{raw: raw, lifetime: PhantomData})
-        }
-    }
-
+    gpgme_linked_list_next!(UserId, UserId<'a>);
 }
 
 pub struct UserId<'a> {
