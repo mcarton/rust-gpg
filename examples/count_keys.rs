@@ -3,8 +3,8 @@ use gnupg::gpgme;
 use gnupg::keys;
 
 fn main() {
-    gpgme::init();
+    let init = gpgme::init();
 
-    let it = keys::KeyIterator::new();
+    let it = keys::KeyIterator::new(init);
     println!("Number of keys in keyring: {}.", it.count());
 }

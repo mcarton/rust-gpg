@@ -3,9 +3,9 @@ use gnupg::gpgme;
 use gnupg::keys;
 
 fn main() {
-    gpgme::init();
+    let init = gpgme::init();
 
-    for (i, key) in keys::KeyIterator::new().enumerate() {
+    for (i, key) in keys::KeyIterator::new(init).enumerate() {
         println!("key {}:", i);
         for subkey in key.subkeys() {
             println!("\t{}", subkey.keyid());

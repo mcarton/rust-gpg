@@ -9,8 +9,8 @@ pub struct KeyIterator {
 impl KeyIterator {
 
     /// Construct a `KeyIterator` over your whole keyring.
-    pub fn new() -> KeyIterator {
-        let ctx = ::gpgme::Context::new();
+    pub fn new(init: ::gpgme::InitToken) -> KeyIterator {
+        let ctx = ::gpgme::Context::new(init);
 
         let err = unsafe {
             ::bindings::gpgme::gpgme_op_keylist_start(
